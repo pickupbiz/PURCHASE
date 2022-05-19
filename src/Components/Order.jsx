@@ -10,16 +10,16 @@ export default function Order() {
   const [existPO, setExistPo] = useState({});
 
   useEffect(() => {
-    const existData = apiData.filter((item) => item.poNumber === poNum);
-    setExistPo(existData);
     const filtered = orderData.filter((item) => item.poNumber === poNum);
     setApiDataPO(filtered);
   }, [poNum]);
 
   const handleAdd = () => {
-    if (existPO.length > 0) {
+    const existData = apiData.filter((item) => item.poNumber === poNum);
+    // setExistPo(existData);
+    if (existData.length > 0) {
       apiData.forEach((item) => {
-        if (item.poNumber === existPO[0].poNumber)
+        if (item.poNumber === existData[0].poNumber)
           item.poQuantity = item.poQuantity + 1;
       });
       setApiData([...apiData]);
