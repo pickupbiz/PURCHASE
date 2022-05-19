@@ -5,55 +5,40 @@ import "./Order.css";
 export default function Order() {
   const [apiData, setApiData] = useState([]);
   const [apiDataPO, setApiDataPO] = useState([]);
-  const [copyapiData, setcopyApiData] = useState([]);
-  const [entryData, setEntryData] = useState({});
-  const [text, setText] = useState("");
-
-  const getData = () => {
-    setApiData(orderData);
-    setcopyApiData(orderData);
-  };
+  const [entryData, setEntryData] = useState([]);
+  const [poNum, setPoNum] = useState(0);
+  const [existPO, setExistPo] = useState({});
 
   useEffect(() => {
-    const filtered = copyapiData.filter((item) => item.poNumber.includes(text));
-    setApiData(filtered);
-  }, [text]);
-
-  useEffect(() => {
-    if (apiData) {
-      const filtered = orderData.filter((item) =>
-        item.poNumber.includes(entryData["poNumber"])
-      );
-      console.log("=======", entryData["poNumber"], "===>>>", filtered);
-      setApiDataPO(filtered);
-    }
-  }, [entryData]);
+    const existData = apiData.filter((item) => item.poNumber === poNum);
+    setExistPo(existData);
+    const filtered = orderData.filter((item) => item.poNumber === poNum);
+    setApiDataPO(filtered);
+  }, [poNum]);
 
   const handleAdd = () => {
-    setApiData([...apiDataPO, ...apiData]);
-    // setcopyApiData([...copyapiData, entryData]);
+    if (existPO.length > 0) {
+      apiData.forEach((item) => {
+        if (item.poNumber === existPO[0].poNumber)
+          item.poQuantity = item.poQuantity + 1;
+      });
+      setApiData([...apiData]);
+    } else {
+      setApiData([...apiDataPO, ...apiData]);
+    }
   };
 
   return (
     <div>
-      {/* <div className='container'>
-            <div className='inventry_Div' onClick={getData} >
-            <h2 className='PO_heading'>Inventry</h2>
-            </div>
-            <div className='order_Div'  >
-            <h2 className='PO_heading'> PO Entry</h2>
-            </div>
-        </div> */}
       <div className="entry_Div">
         <h1>Enter Purchase Order Details</h1>
+
         <input
           type="text"
           className="enter_Text"
           id="po_Text"
           placeholder="Enter PO Number"
-          onChange={(e) =>
-            setEntryData({ ...entryData, poNumber: e.target.value })
-          }
+          onChange={(e) => setPoNum(e.target.value)}
         />
         <input
           type="text"
@@ -82,14 +67,7 @@ export default function Order() {
         />
         <button onClick={handleAdd}>Submit</button>
       </div>
-      <button onClick={getData}>Get PO Details</button>
       <div className="products_Div">
-        <input
-          type="text"
-          className="search_Text"
-          placeholder="Search PO Number"
-          onChange={(e) => setText(e.target.value)}
-        />
         <table>
           <tr>
             <th>Item Cod</th>
@@ -97,7 +75,6 @@ export default function Order() {
             <th>UPC Code</th>
             <th>Quantity</th>
           </tr>
-          {console.log("---->>", apiData)}
           {apiData.map((item) => (
             <tr>
               <td>{item.itemCode}</td>
@@ -107,13 +84,6 @@ export default function Order() {
             </tr>
           ))}
         </table>
-        {/* {apiData.map((item)=>
-        <div className='item_Div'>
-            <h4>Item Cod:-{item.itemCode}</h4>
-            <h4>PO Number:-{item.poNumber}</h4>
-            <h4>UPC Code:-{item.upcCode}</h4>
-            <h4>Quantity:-{item.poQuantity}</h4>
-        </div>)} */}
       </div>
     </div>
   );
