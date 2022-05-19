@@ -26,6 +26,7 @@ export default function Order() {
     } else {
       setApiData([...apiDataPO, ...apiData]);
     }
+    setPoNum("");
   };
 
   return (
@@ -37,21 +38,22 @@ export default function Order() {
           type="text"
           className="enter_Text"
           id="po_Text"
+          value={poNum}
           placeholder="Enter PO Number"
           onChange={(e) => setPoNum(e.target.value)}
         />
         <input
           type="text"
           className="enter_Text"
-          placeholder="Enter Item Code"
-          value={apiDataPO.length > 0 && apiDataPO[0]["itemCode"]}
+          placeholder="Item Code"
+          value={apiDataPO.length > 0 ? apiDataPO[0]["itemCode"] : ""}
           onChange={(e) => setEntryData({ itemCode: e.target.value })}
         />
         <input
           type="text"
           className="enter_Text"
-          placeholder="Enter UPC Code"
-          value={apiDataPO.length > 0 && apiDataPO[0]["upcCode"]}
+          placeholder="UPC Code"
+          value={apiDataPO.length > 0 ? apiDataPO[0]["upcCode"] : ""}
           onChange={(e) =>
             setEntryData({ ...entryData, upcCode: e.target.value })
           }
@@ -59,8 +61,8 @@ export default function Order() {
         <input
           type="text"
           className="enter_Text"
-          placeholder="Enter Quantity"
-          value={apiDataPO.length > 0 && apiDataPO[0]["poQuantity"]}
+          placeholder="Quantity"
+          value={apiDataPO.length > 0 ? apiDataPO[0]["poQuantity"] : ""}
           onChange={(e) =>
             setEntryData({ ...entryData, poQuantity: e.target.value })
           }
