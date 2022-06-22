@@ -8,22 +8,20 @@ export default function Order() {
   const [apiData, setApiData] = useState([]);
   const [apiDataPO, setApiDataPO] = useState([]);
   const [postData, setPostData] = useState([]);
-  const [entryData, setEntryData] = useState([]);
-  const [poNum, setPoNum] = useState(0);
+  const [poNum, setPoNum] = useState();
   const [apipo, setApipo] = useState(0);
-  const [existPO, setExistPo] = useState({});
   const [isSuccess, setIsSuccess] = useState(false);
-
-  const getData = async () => {
+  const [resData, setResData] = useState("");
+  const getData = async (poNumFetch) => {
     const headers = {
       "Content-Type": "application/json",
     };
     const data = {
-      po: "12",
+      po: poNumFetch,
     };
 
     const bodyParameters = {
-      po: "12",
+      po: poNumFetch,
     };
     const config = {
       headers: { contentType: "application/json" },
@@ -31,7 +29,7 @@ export default function Order() {
     const result = await axios.post(`${baseUrl}/pos`, bodyParameters);
     const newItemList = result.data[0].itemlist.map((item) => ({
       ...item,
-      quantity: 0,
+      recquantity: 0,
     }));
     setApiData(newItemList);
     setApipo(result.data[0].po);
@@ -40,29 +38,33 @@ export default function Order() {
   const handleSubmit = async () => {
     const url = `${baseUrl}/posupdate`;
     const objPostData = postData[0];
-    const poPostData = { ...objPostData, itemlist: [...apiData] };
+    const newApiData = apiData.map((item) => ({
+      ...item,
+      quantity: item.recquantity,
+    }));
+    const poPostData = { ...objPostData, itemlist: [...newApiData] };
     const result = await axios.post(url, poPostData);
     if (result.status === 200) {
+      setResData(result.data);
       setIsSuccess(true);
     }
+  };
+  const handleFetchPO = (val) => {
+    getData(val);
+    setIsSuccess(false);
   };
   useEffect(() => {
     const filtered = orderData.filter((item) => item.poNumber === poNum);
     setApiDataPO(filtered);
   }, [poNum]);
 
-  useEffect(() => {
-    getData();
-  }, []);
-
   const handleAdd = (currPoNum) => {
     setPoNum(currPoNum);
     const existData = apiData.filter((item) => item.upccode === currPoNum);
-    // setExistPo(existData);
     if (existData.length > 0) {
       apiData.forEach((item) => {
         if (item.upccode === existData[0].upccode)
-          item.quantity = Number(item.quantity) + 1;
+          item.recquantity = Number(item.recquantity) + 1;
       });
       setApiData([...apiData]);
       setPoNum("");
@@ -75,14 +77,23 @@ export default function Order() {
     <div>
       <div className="entry_Div">
         <h1>Enter Purchase Order Details</h1>
+
+        <input
+          type="number"
+          className="enter_Text"
+          id="po_fetch_Text"
+          placeholder="Enter PO Number"
+          onBlur={(e) => handleFetchPO(e.target.value)}
+        />
         <input
           type="text"
-          className="enter_Text"
           value={poNum}
+          className="enter_Text"
           id="po_Text"
-          placeholder="Enter PO Number"
+          placeholder="Enter UPC Number"
           onChange={(e) => handleAdd(e.target.value)}
         />
+
         {/* <input
           type="text"
           className="enter_Text"
@@ -117,6 +128,7 @@ export default function Order() {
             <th>PO Number</th>
             <th>UPC Code</th>
             <th>Quantity</th>
+            <th> Recieved Qty</th>
           </tr>
           {apiData.map((item) => (
             <tr>
@@ -124,11 +136,22 @@ export default function Order() {
               <td>{apipo}</td>
               <td>{item.upccode}</td>
               <td>{item.quantity}</td>
+              <td>{item.recquantity}</td>
             </tr>
           ))}
         </table>
         <button onClick={handleSubmit}>Submit</button>
         {isSuccess && <h4>Sucessfully Submitted the PO!!</h4>}
+        {isSuccess && (
+          <h4>
+            <i>Response Status:</i> {resData[0].status}
+          </h4>
+        )}
+        {isSuccess && (
+          <h3>
+            <i>Response Reason:</i> {JSON.stringify(resData[0].reason)}
+          </h3>
+        )}
       </div>
     </div>
   );

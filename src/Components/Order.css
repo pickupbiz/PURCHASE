@@ -12,7 +12,6 @@
   text-align: center;
   border-radius: 8px;
   top: 0px;
-  left: 500px;
   position: absolute;
   box-shadow: 5px 5px 5px black;
 }
@@ -66,15 +65,8 @@
   margin-top: 10px;
   margin-left: 5px;
 }
-#po_Text {
-  height: 35px;
-  border-radius: 0px;
-  position: relative;
-  display: block;
-  left: 600px;
-}
 .entry_Div {
-  height: 100px;
+  height: 130px;
   width: 100%;
   background-color: rgb(216, 219, 219);
   margin-top: 10px;
